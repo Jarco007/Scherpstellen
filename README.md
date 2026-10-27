@@ -1,5 +1,7 @@
 # Scherpstellen
 
+🔗 **[▶ Open de app](https://jarco007.github.io/Scherpstellen/)**
+
 **ROT Trainingsvoorbereidingstool** — ontwikkeld door [Scherp in Veiligheid](https://scherpinveiligheid.nl)
 
 Scherpstellen helpt trainers om ROT (Regionaal Operationeel Team) trainingssessies beter voor te bereiden door vooraf inzicht te krijgen in de ervaringen en leerdoelen van deelnemers.
