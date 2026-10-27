@@ -1,0 +1,1468 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+
+<title>Scherpstellen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap">
+
+<style>
+  /* === DESIGN TOKENS === */
+  /* Layout: stacked single-column wizard met sidepanel uitkomst */
+  :root {
+    --teal:   #006a8e;
+    --teal-d: #00506c;
+    --teal-l: #e0f2f9;
+    --orange: #ff6a13;
+    --orange-d: #d95200;
+    --bg:     #f4f8fb;
+    --card:   #ffffff;
+    --fg:     #0d1f2d;
+    --fg-2:   #4a6070;
+    --border: #ccdde8;
+    --tag-bg: #e8f4fa;
+    --low:    #27ae60;
+    --mid:    #f39c12;
+    --high:   #006a8e;
+    --radius: 12px;
+    --shadow: 0 2px 16px rgba(0,106,142,0.10);
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:     #0d1a24;
+      --card:   #122030;
+      --fg:     #e8f2f8;
+      --fg-2:   #7faac0;
+      --border: #1e3a4f;
+      --tag-bg: #1a3045;
+      --teal-l: #0d2a38;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:     #0d1a24;
+    --card:   #122030;
+    --fg:     #e8f2f8;
+    --fg-2:   #7faac0;
+    --border: #1e3a4f;
+    --tag-bg: #1a3045;
+    --teal-l: #0d2a38;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 15px;
+    line-height: 1.6;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0;
+    min-height: 100%;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Sora', system-ui, sans-serif;
+    line-height: 1.2;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  /* ========================
+     STARTSCHERM
+  ======================== */
+  #screen-start {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .start-header {
+    background: var(--teal);
+    color: #fff;
+    padding-block: 40px 36px;
+    padding-left: max(32px, env(safe-area-inset-left, 0px));
+    padding-right: max(32px, env(safe-area-inset-right, 0px));
+    position: relative;
+    overflow: hidden;
+  }
+  .start-header::after {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    pointer-events: none;
+  }
+  .start-header::before {
+    content: '';
+    position: absolute;
+    right: 60px;
+    bottom: -60px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(255,106,19,0.18);
+    pointer-events: none;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--orange);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { width: 20px; height: 20px; }
+  .logo-name {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -.2px;
+    opacity: .92;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    background: rgba(255,106,19,.22);
+    color: #ffd4b3;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .start-header h1 {
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .start-header h1 span { color: #ff9e6a; }
+  .start-header p {
+    color: rgba(255,255,255,.80);
+    font-size: 15px;
+    max-width: 480px;
+    margin: 0;
+  }
+
+  .start-body {
+    flex: 1;
+    padding: 32px max(16px, env(safe-area-inset-left, 0px));
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .info-card h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 10px;
+  }
+  .info-card p {
+    color: var(--fg-2);
+    font-size: 14px;
+    margin: 0 0 0 0;
+  }
+
+  .steps-list {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .steps-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--fg-2);
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .step-num.orange { background: var(--orange); }
+
+  .disclaimer-box {
+    background: var(--teal-l);
+    border-left: 4px solid var(--teal);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--fg-2);
+    margin-bottom: 24px;
+  }
+  .disclaimer-box strong { color: var(--teal); display: block; margin-bottom: 4px; }
+
+  .time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--fg-2);
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-bottom: 20px;
+  }
+
+  .btn-start {
+    display: block;
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--orange);
+    color: #fff;
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-align: center;
+    transition: background .18s, transform .12s;
+    letter-spacing: -.1px;
+  }
+  .btn-start:hover { background: var(--orange-d); }
+  .btn-start:active { transform: scale(.98); }
+  .btn-start:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+
+  /* ========================
+     VRAGENLIJST SCHERM
+  ======================== */
+  #screen-questions { display: none; }
+
+  .q-header {
+    background: var(--teal);
+    padding-block: 24px;
+    padding-left: max(24px, env(safe-area-inset-left, 0px));
+    padding-right: max(24px, env(safe-area-inset-right, 0px));
+  }
+  .q-header .back-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,.75);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    margin-bottom: 12px;
+    font-family: inherit;
+  }
+  .q-header .back-btn:hover { color: #fff; }
+  .q-header h2 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .q-header p {
+    color: rgba(255,255,255,.72);
+    font-size: 13px;
+    margin: 0;
+  }
+
+  /* Progress bar */
+  .progress-track {
+    height: 4px;
+    background: rgba(255,255,255,.2);
+    border-radius: 4px;
+    margin-top: 14px;
+  }
+  .progress-fill {
+    height: 4px;
+    background: var(--orange);
+    border-radius: 4px;
+    transition: width .35s ease;
+  }
+
+  .q-body {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 28px max(16px, env(safe-area-inset-left, 0px)) 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .q-section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--teal);
+    background: var(--teal-l);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-bottom: 4px;
+  }
+
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .q-card label {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .q-card .q-hint {
+    font-size: 13px;
+    color: var(--fg-2);
+    margin: -8px 0 4px;
+  }
+
+  /* Radio cards */
+  .radio-grid {
+    display: grid;
+    gap: 8px;
+  }
+  .radio-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 480px) {
+    .radio-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+  }
+
+  .radio-option {
+    position: relative;
+    cursor: pointer;
+  }
+  .radio-option input[type=radio] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+  }
+  .radio-option .radio-label {
+    display: block;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 14px;
+    color: var(--fg-2);
+    transition: border-color .15s, background .15s, color .15s;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 500;
+  }
+  .radio-option input:checked + .radio-label {
+    border-color: var(--teal);
+    background: var(--teal-l);
+    color: var(--teal);
+    font-weight: 600;
+  }
+  .radio-option:hover .radio-label { border-color: var(--teal); }
+  .radio-option input:focus-visible + .radio-label { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+  /* Checkbox grid */
+  .check-grid {
+    display: grid;
+    gap: 7px;
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 480px) { .check-grid { grid-template-columns: 1fr; } }
+
+  .check-option {
+    position: relative;
+    cursor: pointer;
+  }
+  .check-option input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+  }
+  .check-option .check-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--fg-2);
+    cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+    font-weight: 500;
+  }
+  .check-option .check-label::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    background: var(--card);
+    transition: background .15s, border-color .15s;
+  }
+  .check-option input:checked + .check-label {
+    border-color: var(--teal);
+    background: var(--teal-l);
+    color: var(--teal);
+    font-weight: 600;
+  }
+  .check-option input:checked + .check-label::before {
+    background: var(--teal);
+    border-color: var(--teal);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l3 3 5-6' stroke='%23fff' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .check-option input:focus-visible + .check-label { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 8px; }
+
+  /* Textarea */
+  .q-textarea {
+    width: 100%;
+    min-height: 90px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--fg);
+    background: var(--card);
+    resize: vertical;
+    transition: border-color .15s;
+    line-height: 1.5;
+  }
+  .q-textarea:focus { outline: none; border-color: var(--teal); }
+  .q-textarea::placeholder { color: var(--fg-2); opacity: .6; }
+
+  /* Range slider */
+  .slider-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--fg-2);
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--border);
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--teal);
+    border: 3px solid var(--card);
+    box-shadow: 0 1px 6px rgba(0,106,142,.25);
+    cursor: pointer;
+  }
+  input[type=range]:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; }
+
+  .slider-val {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    background: var(--teal-l);
+    border-radius: 20px;
+    padding: 2px 12px;
+    align-self: center;
+  }
+
+  /* Submit */
+  .btn-submit {
+    padding: 15px 28px;
+    background: var(--teal);
+    color: #fff;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    text-align: center;
+    transition: background .18s, transform .12s;
+    letter-spacing: -.1px;
+    margin-top: 8px;
+  }
+  .btn-submit:hover { background: var(--teal-d); }
+  .btn-submit:active { transform: scale(.98); }
+  .btn-submit:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+
+  /* ========================
+     RESULTAAT SCHERM
+  ======================== */
+  #screen-result { display: none; }
+
+  .result-header {
+    background: var(--teal);
+    padding-block: 28px;
+    padding-left: max(24px, env(safe-area-inset-left, 0px));
+    padding-right: max(24px, env(safe-area-inset-right, 0px));
+  }
+  .result-header p { color: rgba(255,255,255,.7); font-size: 13px; margin: 6px 0 0; }
+  .result-header h2 { color: #fff; font-size: 22px; font-weight: 700; }
+
+  .result-body {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px max(16px, env(safe-area-inset-left, 0px)) 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* Ervaringsniveau */
+  .level-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .level-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .level-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .level-icon.low  { background: #e8f9f0; }
+  .level-icon.mid  { background: #fff3e0; }
+  .level-icon.high { background: #e0f2f9; }
+
+  .level-text h3 { font-size: 18px; font-weight: 700; }
+  .level-text h3.low  { color: var(--low); }
+  .level-text h3.mid  { color: var(--mid); }
+  .level-text h3.high { color: var(--high); }
+  .level-text p { font-size: 13px; color: var(--fg-2); margin: 3px 0 0; }
+
+  /* Bar visualisatie */
+  .level-bars {
+    display: flex;
+    gap: 6px;
+    padding: 16px 24px;
+    align-items: center;
+  }
+  .bar-seg {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--border);
+    transition: background .4s;
+  }
+  .bar-seg.active.low  { background: var(--low); }
+  .bar-seg.active.mid  { background: var(--mid); }
+  .bar-seg.active.high { background: var(--high); }
+  .bar-label {
+    font-size: 11px;
+    color: var(--fg-2);
+    text-align: center;
+    flex: 0 0 60px;
+    font-weight: 500;
+  }
+
+  /* Aanbevelingen trainer */
+  .trainer-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+  }
+  .trainer-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .trainer-card h3 span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--orange);
+    color: #fff;
+    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .trait-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .trait-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--fg-2);
+    line-height: 1.5;
+  }
+  .trait-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--teal);
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+
+  /* Scenario's */
+  .scenarios-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+  }
+  .scenarios-card > h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .scenarios-card > .sub {
+    font-size: 13px;
+    color: var(--fg-2);
+    margin-bottom: 18px;
+  }
+  .scenario-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    transition: border-color .15s;
+  }
+  .scenario-item:last-child { margin-bottom: 0; }
+  .scenario-item:hover { border-color: var(--teal); }
+  .scenario-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .scenario-rank {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Sora', sans-serif;
+  }
+  .scenario-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--fg);
+    flex: 1;
+  }
+  .scenario-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .scenario-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--tag-bg);
+    color: var(--teal);
+    border: 1px solid var(--border);
+  }
+  .scenario-tag.orange { background: #fff1e8; color: var(--orange-d); border-color: #ffd5b5; }
+
+  .scenario-desc {
+    font-size: 13px;
+    color: var(--fg-2);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .scenario-why {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--teal);
+    font-weight: 500;
+  }
+  .scenario-why svg { margin-top: 1px; flex-shrink: 0; }
+
+  /* Actiebalk onderaan */
+  .action-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-top: 8px;
+  }
+  .btn-action {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background .15s, transform .1s;
+  }
+  .btn-action:active { transform: scale(.97); }
+  .btn-action.primary { background: var(--orange); color: #fff; }
+  .btn-action.primary:hover { background: var(--orange-d); }
+  .btn-action.secondary { background: var(--card); color: var(--teal); border: 1.5px solid var(--teal); }
+  .btn-action.secondary:hover { background: var(--teal-l); }
+  .btn-action:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+
+  /* Print / export hint */
+  .export-note {
+    font-size: 12px;
+    color: var(--fg-2);
+    text-align: center;
+    opacity: .7;
+  }
+</style>
+
+<!-- ============================
+     SCHERM 1: START
+============================= -->
+<div id="screen-start">
+  <div class="start-header">
+    <div class="logo-row">
+      <div class="logo-mark">
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M3 10 L10 3 L17 10 L10 17 Z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>
+          <circle cx="10" cy="10" r="2.5" fill="#fff"/>
+        </svg>
+      </div>
+      <span class="logo-name">Scherp in Veiligheid</span>
+    </div>
+    <div class="hero-tag">ROT Trainingsvoorbereiding</div>
+    <h1>Scherpstellen <span>—</span><br>stem de training af</h1>
+    <p>Geef je trainer vooraf inzicht in je ervaring, zodat de training echt aansluit op waar jij staat.</p>
+  </div>
+
+  <div class="start-body">
+    <div class="disclaimer-box">
+      <strong>Gericht op jou als deelnemer</strong>
+      Deze vragenlijst is niet bedoeld als toets of beoordeling. Je antwoorden worden uitsluitend gebruikt om de training beter af te stemmen op de groep. Er zijn geen foute antwoorden — wees zo eerlijk mogelijk.
+    </div>
+
+    <div class="time-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Invullen duurt ongeveer 5 minuten
+    </div>
+
+    <div class="info-card">
+      <h2>Wat ga je invullen?</h2>
+      <ul class="steps-list">
+        <li>
+          <span class="step-num">1</span>
+          <span><strong>Jouw achtergrond</strong> — hoe lang werk je al in de crisisorganisatie en in welke rol?</span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span><strong>Praktijkervaring</strong> — welke incidenten en crises heb je eerder meegemaakt?</span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span><strong>Leerdoelen</strong> — waar wil jij sterker in worden binnen het ROT?</span>
+        </li>
+        <li>
+          <span class="step-num orange">4</span>
+          <span><strong>Leerstijl</strong> — hoe leer jij het best: in actie, door reflectie, of via uitleg?</span>
+        </li>
+      </ul>
+    </div>
+
+    <button class="btn-start" onclick="showQuestions()">
+      Start de vragenlijst →
+    </button>
+  </div>
+</div>
+
+<!-- ============================
+     SCHERM 2: VRAGENLIJST
+============================= -->
+<div id="screen-questions">
+  <div class="q-header">
+    <button class="back-btn" onclick="showStart()">
+      ← Terug naar start
+    </button>
+    <h2 id="q-section-title">Jouw achtergrond</h2>
+    <p id="q-section-sub">Sectie 1 van 4</p>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-bar" style="width:10%"></div>
+    </div>
+  </div>
+
+  <div class="q-body">
+
+    <!-- ── SECTIE A: ACHTERGROND ── -->
+    <div class="q-section-block" data-section="0">
+      <div class="q-section-label">👤 Achtergrond</div>
+      <div class="q-card">
+        <label for="q-rol">In welke rol ben je actief binnen het ROT?</label>
+        <div class="radio-grid">
+          <label class="radio-option"><input type="radio" name="rol" value="Hoofd Sectie Bevolkingszorg"><span class="radio-label">Hoofd Sectie Bevolkingszorg</span></label>
+          <label class="radio-option"><input type="radio" name="rol" value="Hoofd Sectie Brandweer"><span class="radio-label">Hoofd Sectie Brandweer</span></label>
+          <label class="radio-option"><input type="radio" name="rol" value="Hoofd Sectie Politie"><span class="radio-label">Hoofd Sectie Politie</span></label>
+          <label class="radio-option"><input type="radio" name="rol" value="Hoofd Sectie GHOR"><span class="radio-label">Hoofd Sectie GHOR</span></label>
+          <label class="radio-option"><input type="radio" name="rol" value="Operationeel Leider"><span class="radio-label">Operationeel Leider</span></label>
+          <label class="radio-option"><input type="radio" name="rol" value="Informatiemanager"><span class="radio-label">Informatiemanager</span></label>
+          <label class="radio-option" id="rol-overige-option"><input type="radio" name="rol" value="Overige" onchange="toggleOverigeRol(this)"><span class="radio-label">Overige…</span></label>
+        </div>
+        <div id="overige-rol-wrap" style="display:none;margin-top:8px">
+          <input type="text" id="overige-rol-input" class="q-textarea" style="min-height:0;padding:10px 14px;font-size:14px" placeholder="Bijv.: Liaison, Communicatieadviseur, Waterschap…" oninput="syncOverigeRol(this.value)">
+        </div>
+      </div>
+
+      <div class="q-card">
+        <label>Hoelang ben je al actief in de crisisorganisatie?</label>
+        <p class="q-hint">Denk aan je totale ervaring, ook buiten het ROT.</p>
+        <div class="slider-row">
+          <div class="slider-labels">
+            <span>Minder dan 1 jaar</span>
+            <span>10+ jaar</span>
+          </div>
+          <input type="range" id="q-jaren" name="jaren" min="0" max="10" value="3" oninput="updateSlider('q-jaren','val-jaren', jaarLabel)">
+          <div class="slider-val" id="val-jaren">3 jaar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTIE B: PRAKTIJKERVARING ── -->
+    <div class="q-section-block" data-section="1">
+      <div class="q-section-label">🚨 Praktijkervaring</div>
+      <div class="q-card">
+        <label>Welke typen incidenten heb je de afgelopen 2 jaar meegemaakt?</label>
+        <p class="q-hint">Selecteer alles wat van toepassing is op jouw eigen crisisorganisatie.</p>
+        <div class="check-grid">
+          <label class="check-option"><input type="checkbox" name="incident" value="Stroomuitval / infra"><span class="check-label">Stroomuitval / infra</span></label>
+          <label class="check-option"><input type="checkbox" name="incident" value="Overstroming / wateroverlast"><span class="check-label">Overstroming / wateroverlast</span></label>
+          <label class="check-option"><input type="checkbox" name="incident" value="CBRN / gevaarlijke stoffen"><span class="check-label">CBRN / gevaarlijke stoffen</span></label>
+          <label class="check-option"><input type="checkbox" name="incident" value="Terrorisme / openbare orde"><span class="check-label">Terrorisme / openbare orde</span></label>
+          <label class="check-option"><input type="checkbox" name="incident" value="Brand (groot / industrieel)"><span class="check-label">Brand (groot / industrieel)</span></label>
+          <label class="check-option"><input type="checkbox" name="incident" value="Cyberaanval / datalek"><span class="check-label">Cyberaanval / datalek</span></label>
+          <label class="check-option"><input type="checkbox" name="incident" value="Zorgcrisis / pandemie"><span class="check-label">Zorgcrisis / pandemie</span></label>
+          <label class="check-option"><input type="checkbox" name="incident" value="Migratiecrisis / opvang"><span class="check-label">Migratiecrisis / opvang</span></label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <label for="q-incident-open">Beschrijf kort een incident dat je het meeste heeft geleerd.</label>
+        <p class="q-hint">Optioneel — het gaat om de leerervaring, niet de details.</p>
+        <textarea id="q-incident-open" name="incident_open" class="q-textarea" rows="3" placeholder="Bijv.: 'Bij een stroomstoring in 2024 liep de informatieoverdracht stroef. Ik merkte dat ik onvoldoende zicht had op de acties van andere secties…'"></textarea>
+      </div>
+    </div>
+
+    <!-- ── SECTIE C: LEERDOELEN ── -->
+    <div class="q-section-block" data-section="2">
+      <div class="q-section-label">🎯 Leerdoelen</div>
+      <div class="q-card">
+        <label>Welke onderdelen van het ROT wil jij versterken?</label>
+        <p class="q-hint">Kies maximaal 3 thema's die jij het meest relevant vindt.</p>
+        <div class="check-grid">
+          <label class="check-option"><input type="checkbox" name="leerdoel" value="Besluitvorming onder druk"><span class="check-label">Besluitvorming onder druk</span></label>
+          <label class="check-option"><input type="checkbox" name="leerdoel" value="Netcentrisch werken"><span class="check-label">Netcentrisch werken</span></label>
+          <label class="check-option"><input type="checkbox" name="leerdoel" value="Communicatie richting GBT"><span class="check-label">Communicatie richting GBT</span></label>
+          <label class="check-option"><input type="checkbox" name="leerdoel" value="Samenwerking in het ROT"><span class="check-label">Samenwerking in het ROT</span></label>
+          <label class="check-option"><input type="checkbox" name="leerdoel" value="Situational awareness"><span class="check-label">Situational awareness</span></label>
+          <label class="check-option"><input type="checkbox" name="leerdoel" value="Opschaling en afschaling"><span class="check-label">Opschaling en afschaling</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTIE D: LEERSTIJL ── -->
+    <div class="q-section-block" data-section="3">
+      <div class="q-section-label">💡 Leerstijl</div>
+      <div class="q-card">
+        <label>Hoe leer jij het beste?</label>
+        <p class="q-hint">Kies de aanpak die het beste bij jou past.</p>
+        <div class="radio-grid">
+          <label class="radio-option">
+            <input type="radio" name="leerstijl" value="doende">
+            <span class="radio-label"><strong>Doende</strong><br><small>Door direct aan de slag te gaan en van fouten te leren</small></span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="leerstijl" value="reflecterend">
+            <span class="radio-label"><strong>Reflecterend</strong><br><small>Door goed te observeren en te overdenken wat er is gebeurd</small></span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="leerstijl" value="theoretisch">
+            <span class="radio-label"><strong>Theoretisch</strong><br><small>Door een goed kader en de achterliggende principes te begrijpen</small></span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="leerstijl" value="pragmatisch">
+            <span class="radio-label"><strong>Pragmatisch</strong><br><small>Door concrete tips en direct toepasbare handvatten te krijgen</small></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="q-card">
+        <label>Hoe zelfzeker voel jij je momenteel in jouw ROT-rol?</label>
+        <div class="slider-row">
+          <div class="slider-labels">
+            <span>Nog onzeker</span>
+            <span>Heel zelfverzekerd</span>
+          </div>
+          <input type="range" id="q-zeker" name="zeker" min="1" max="5" value="3" oninput="updateSlider('q-zeker','val-zeker', zekerLabel)">
+          <div class="slider-val" id="val-zeker">Redelijk zeker</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="berekenResultaat()">
+      Bekijk mijn trainingsprofiel →
+    </button>
+
+  </div>
+</div>
+
+<!-- ============================
+     SCHERM 3: RESULTAAT
+============================= -->
+<div id="screen-result">
+  <div class="result-header">
+    <div class="back-btn" style="display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer;margin-bottom:10px;" onclick="showQuestions()">
+      ← Pas antwoorden aan
+    </div>
+    <h2>Trainingsprofiel <span id="res-naam"></span></h2>
+    <p>Samengesteld op basis van de ingevulde vragenlijst</p>
+  </div>
+
+  <div class="result-body">
+
+    <!-- Ervaringsniveau -->
+    <div class="level-card">
+      <div class="level-banner">
+        <div class="level-icon" id="res-icon">🔰</div>
+        <div class="level-text">
+          <h3 id="res-level-title">Weinig ervaring</h3>
+          <p id="res-level-sub">Ervaringsniveau op basis van jouw antwoorden</p>
+        </div>
+      </div>
+      <div class="level-bars">
+        <span class="bar-label" style="text-align:left">Weinig</span>
+        <div class="bar-seg" id="bar1"></div>
+        <div class="bar-seg" id="bar2"></div>
+        <div class="bar-seg" id="bar3"></div>
+        <div class="bar-seg" id="bar4"></div>
+        <div class="bar-seg" id="bar5"></div>
+        <div class="bar-seg" id="bar6"></div>
+        <span class="bar-label" style="text-align:right">Gevorderd</span>
+      </div>
+    </div>
+
+    <!-- Trainerinzicht -->
+    <div class="trainer-card">
+      <h3><span>💡</span> Inzicht voor de trainer</h3>
+      <ul class="trait-list" id="trainer-insights"></ul>
+    </div>
+
+    <!-- Scenario's -->
+    <div class="scenarios-card">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Top 3 oefenscenario's — aanbevolen op jouw profiel
+      </h3>
+      <p class="sub">Gebaseerd op actuele incidenten (mei–okt 2026) en jouw praktijkervaring</p>
+      <div id="scenario-list"></div>
+    </div>
+
+    <!-- Acties -->
+    <div class="action-bar">
+      <button class="btn-action primary" id="btn-gdoc" onclick="exportNaarGoogleDoc()">📄 Exporteer naar Google Doc</button>
+      <button class="btn-action secondary" onclick="showQuestions()">← Antwoorden aanpassen</button>
+      <button class="btn-action secondary" onclick="herstart()">↩ Opnieuw invullen</button>
+    </div>
+    <p class="export-note">De export opent een nieuw Google Doc met het volledige trainingsprofiel — klaar om te delen met je trainer.</p>
+
+    <!-- Export status -->
+    <div id="export-status" hidden style="margin-top:12px; padding:14px 18px; border-radius:10px; font-size:14px; display:flex; align-items:center; gap:10px;"></div>
+  </div>
+</div>
+
+
+<script>
+  /* ── HELPERS ── */
+  function $(id){ return document.getElementById(id); }
+
+  function showStart(){
+    $('screen-start').style.display = 'flex';
+    $('screen-questions').style.display = 'none';
+    $('screen-result').style.display = 'none';
+    window.scrollTo(0,0);
+  }
+  function toggleOverigeRol(el){
+    const wrap = $('overige-rol-wrap');
+    wrap.style.display = el.checked ? 'block' : 'none';
+    if(el.checked) $('overige-rol-input').focus();
+  }
+  function syncOverigeRol(val){
+    // Sla de getypte waarde op als data-attr zodat export het kan lezen
+    const radio = document.querySelector('input[name=rol][value=Overige]');
+    if(radio) radio.dataset.custom = val;
+  }
+  function showQuestions(){
+    $('screen-start').style.display = 'none';
+    $('screen-questions').style.display = 'block';
+    $('screen-result').style.display = 'none';
+    // Zorg dat sliders correct geïnitialiseerd zijn na eerste keer tonen
+    updateSlider('q-jaren','val-jaren',jaarLabel);
+    updateSlider('q-zeker','val-zeker',zekerLabel);
+    window.scrollTo(0,0);
+  }
+
+  function jaarLabel(v){ return v==10?'10+ jaar': v==0?'< 1 jaar': v+' jaar'; }
+  function zekerLabel(v){
+    return ['','Nog onzeker','Soms onzeker','Redelijk zeker','Vrij zeker','Heel zeker'][v];
+  }
+
+  function updateSlider(inputId, valId, labelFn){
+    const el = $(inputId), vEl = $(valId);
+    const v = parseInt(el.value);
+    vEl.textContent = labelFn(v);
+    // kleur de track
+    const pct = ((v - el.min)/(el.max-el.min))*100;
+    el.style.background = `linear-gradient(to right, var(--teal) ${pct}%, var(--border) ${pct}%)`;
+  }
+  function herstart(){
+    // Reset alle form-velden
+    document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+    document.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=false);
+    document.querySelectorAll('textarea').forEach(t=>t.value='');
+    $('q-jaren').value = 3;
+    $('q-zeker').value = 3;
+    $('overige-rol-wrap').style.display='none';
+    $('overige-rol-input').value='';
+    updateSlider('q-jaren','val-jaren',jaarLabel);
+    updateSlider('q-zeker','val-zeker',zekerLabel);
+    showStart();
+  }
+
+  // init sliders na DOM-ready (scherm is hidden bij load, dus doen we dit ook in showQuestions)
+  updateSlider('q-jaren','val-jaren',jaarLabel);
+  updateSlider('q-zeker','val-zeker',zekerLabel);
+
+  /* ── SCORE BEREKENEN ── */
+  function berekenResultaat(){
+    const jaren     = parseInt($('q-jaren').value);
+    const zeker     = parseInt($('q-zeker').value);
+    const incids    = document.querySelectorAll('input[name=incident]:checked').length;
+    const leerdoelen = document.querySelectorAll('input[name=leerdoel]:checked').length;
+    const rolEl     = document.querySelector('input[name=rol]:checked');
+    const leerstijlEl = document.querySelector('input[name=leerstijl]:checked');
+    const rolWaarde = rolEl ? (rolEl.value === 'Overige' ? ($('overige-rol-input').value.trim() || 'Overige') : rolEl.value) : 'Onbekende rol';
+
+    // Score 0–100
+    let score = 0;
+    score += Math.min(jaren, 10) * 4;   // max 40
+    score += zeker * 5;                  // max 25
+    score += Math.min(incids, 4) * 4;   // max 16 (meer incidenten = meer ervaring)
+    score += (4 - Math.min(leerdoelen,4)) * 2; // minder leerdoelen = meer routin
+
+    const incidentTypes = [...document.querySelectorAll('input[name=incident]:checked')].map(e=>e.value);
+    const leerdoelTypes = [...document.querySelectorAll('input[name=leerdoel]:checked')].map(e=>e.value);
+    const rol  = rolWaarde;
+    const leerstijl = leerstijlEl ? leerstijlEl.value : null;
+
+    let level, levelClass, icon, beschrijving, insights;
+    if(score < 38){
+      level='Weinig ervaring'; levelClass='low'; icon='🔰';
+      beschrijving='Starter die baat heeft bij structuur en stapsgewijze begeleiding.';
+      insights = [
+        'Focus op rolbewustzijn en basisprocessen binnen het ROT.',
+        'Gebruik herkenbare, enkelvoudige scenario\'s zonder veel gelijktijdige uitdagingen.',
+        'Bouw in met expliciete terugkoppelmomenten en gestructureerde reflectie.',
+        'Koppel leerstijl aan ' + (leerstijl ? leerstijl : 'de voorkeur van de deelnemer') + ' — pas het werktempo aan.',
+      ];
+    } else if(score < 62){
+      level='Gemiddelde ervaring'; levelClass='mid'; icon='🎯';
+      beschrijving='Redelijk ingevoerde functionaris die scenario\'s kan verwerken maar nog ruimte heeft voor verdieping.';
+      insights = [
+        'Zet in op situational awareness en besluitvorming in complexe situaties.',
+        'Gebruik scenario\'s met meerdere gelijktijdige informatiestromen.',
+        'Laat de deelnemer zelf procesafwijkingen signaleren en adresseren.',
+        'Deelnemer heeft eerder meegemaakt: ' + (incidentTypes.length ? incidentTypes.slice(0,3).join(', ') : 'geen specifieke incidenten geselecteerd') + '.',
+      ];
+    } else {
+      level='Gevorderd'; levelClass='high'; icon='🏆';
+      beschrijving='Ervaren functionaris die complexe scenario\'s aankan en als ankerpunt voor de groep kan fungeren.';
+      insights = [
+        'Richt op het aansturen van processen én het bewaken van het grotere plaatje.',
+        'Introduceer dilemma\'s en ethische keuzes onder tijdsdruk.',
+        'Betrek als koploper of reflector bij groepsoefeningen.',
+        'Leerdoelen zijn gericht op: ' + (leerdoelTypes.length ? leerdoelTypes.join(', ') : 'brede versterking') + '.',
+      ];
+    }
+
+    // Rendeer niveau
+    $('res-naam').textContent = '— ' + rol;
+    const lt = $('res-level-title');
+    lt.textContent = level;
+    lt.className = levelClass;
+    $('res-level-sub').textContent = beschrijving;
+    $('res-icon').textContent = icon;
+    $('res-icon').className = 'level-icon ' + levelClass;
+
+    // Bars
+    const bars = 6;
+    let filled;
+    if(levelClass==='low') filled=2;
+    else if(levelClass==='mid') filled=4;
+    else filled=6;
+    for(let i=1;i<=bars;i++){
+      const b=$('bar'+i);
+      b.className='bar-seg' + (i<=filled? ' active '+levelClass : '');
+    }
+
+    // Insights
+    const ins=$('trainer-insights'); ins.innerHTML='';
+    insights.forEach(t=>{
+      const li=document.createElement('li');
+      li.innerHTML='<span class="trait-dot"></span><span>'+t+'</span>';
+      ins.appendChild(li);
+    });
+
+    // Scenario's selectie
+    const scenarios = kiesScenarios(levelClass, incidentTypes, leerdoelTypes);
+    const sl=$('scenario-list'); sl.innerHTML='';
+    scenarios.forEach((s,i)=>{
+      sl.innerHTML += `
+        <div class="scenario-item">
+          <div class="scenario-top">
+            <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+              <div class="scenario-rank">${i+1}</div>
+              <div class="scenario-name">${s.naam}</div>
+            </div>
+            <div class="scenario-tags">
+              ${s.tags.map(t=>`<span class="scenario-tag ${t.c||''}">${t.l}</span>`).join('')}
+            </div>
+          </div>
+          <p class="scenario-desc">${s.omschrijving}</p>
+          <div class="scenario-why">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            ${s.waarom}
+          </div>
+        </div>`;
+    });
+
+    $('screen-questions').style.display='none';
+    $('screen-result').style.display='block';
+    window.scrollTo(0,0);
+  }
+
+  /* ── SCENARIO DATABASE (actueel apr–okt 2025) ── */
+  function kiesScenarios(level, incidents, leerdoelen){
+    const bank = [
+      {
+        naam: 'Grootschalige stroomstoring stedelijk gebied',
+        tags:[{l:'Actueel 2026'},{l:'Infra',c:'orange'},{l:'Multidisciplinair'}],
+        omschrijving:'Een uitgebreide stroomstoring treft meerdere wijken. Ziekenhuizen schakelen over op noodstroom, communicatienetwerken vallen deels uit. Het ROT moet opschalen en snel besluiten nemen over prioritering van vitale locaties.',
+        waarom:'Stroomstoringen door netoverbelasting en extreem weer blijven in 2026 actueel. Past bij vrijwel alle niveaus en rollen binnen het ROT.',
+        niveau:['low','mid','high'], incidentMatch:['Stroomuitval / infra'], leerdoelMatch:['Besluitvorming onder druk','Opschaling en afschaling']
+      },
+      {
+        naam: 'Cyberaanval op gemeentelijke systemen',
+        tags:[{l:'Actueel 2026'},{l:'Cyber',c:'orange'},{l:'Informatiemanagement'}],
+        omschrijving:'Kritieke systemen van de gemeente liggen plat door ransomware. Het crisismanagementteam moet zonder digitale middelen opereren en besluiten over communicatie naar inwoners en partners.',
+        waarom:'Ransomware-aanvallen op overheden zijn in 2026 verder toegenomen. Oefent netcentrisch werken onder verstoorde omstandigheden.',
+        niveau:['mid','high'], incidentMatch:['Cyberaanval / datalek'], leerdoelMatch:['Netcentrisch werken','Situational awareness']
+      },
+      {
+        naam: 'Vliegtuigongeval nabij woonwijk',
+        tags:[{l:'Multidisciplinair'},{l:'Opschaling'},{l:'Hoog tempo'}],
+        omschrijving:'Een vliegtuig crasht bij een woonwijk. Binnen 20 minuten moeten evacuatiebesluiten worden genomen, GBT en ROT moeten afstemmen over zeggenschap, en de media-aanvragen stromen al binnen.',
+        waarom:'Toetst besluitvorming onder extreme tijdsdruk en de samenwerking GBT–ROT. Geschikt voor alle rollen; complexiteit is op te schalen per niveau.',
+        niveau:['low','mid','high'], incidentMatch:[], leerdoelMatch:['Besluitvorming onder druk','Communicatie richting GBT','Samenwerking in het ROT']
+      },
+      {
+        naam: 'Wateroverlast door extreme neerslag',
+        tags:[{l:'Actueel 2026'},{l:'Bevolkingszorg'},{l:'Regionale coördinatie'}],
+        omschrijving:'Extreme regenval veroorzaakt overstroming in een lager gelegen wijk. Evacuatie van 1.200 inwoners, opvang coördineren, waterschapsvragen en politieke druk samenkomen in het ROT.',
+        waarom:'Wateroverlast door extreme neerslag is in de zomer van 2026 opnieuw actueel gebleken. Oefent bevolkingszorg en multi-agency coördinatie.',
+        niveau:['mid','high'], incidentMatch:['Overstroming / wateroverlast'], leerdoelMatch:['Samenwerking in het ROT','Situational awareness']
+      },
+      {
+        naam: 'Demonstratie met escalatierisico',
+        tags:[{l:'Openbare orde'},{l:'Actueel 2026'},{l:'Bestuurlijke druk'}],
+        omschrijving:'Een grote demonstratie dreigt te escaleren. Tegendemonstranten zijn aanwezig; social media voegt mis­informatie toe. Het ROT ondersteunt de burgemeester bij het afwegen van maatregelen.',
+        waarom:'Openbare orde-incidenten met desinformatie via sociale media zijn in 2026 actueel. Test de lijn ROT–GBT en besluitvorming onder maatschappelijke druk.',
+        niveau:['mid','high'], incidentMatch:['Terrorisme / openbare orde'], leerdoelMatch:['Communicatie richting GBT','Besluitvorming onder druk']
+      },
+      {
+        naam: 'GRIP 2 brand industrieterrein',
+        tags:[{l:'Multidisciplinair'},{l:'CBRN-raakvlak'},{l:'Instapscenario'}],
+        omschrijving:'Een grote brand op een industrieterrein met onbekende chemische stoffen. Opschaling naar GRIP 2. Het ROT wordt voor het eerst actief en moet processen opstarten en sectiehoofden aansturen.',
+        waarom:'Klassiek instapscenario dat alle ROT-rollen activeert zonder overmatige complexiteit. Ideaal voor deelnemers met weinig of gemiddelde ervaring.',
+        niveau:['low','mid'], incidentMatch:['Brand (groot / industrieel)','CBRN / gevaarlijke stoffen'], leerdoelMatch:['Opschaling en afschaling','Samenwerking in het ROT']
+      },
+    ];
+
+    // Score elke scenario op relevantie
+    const scored = bank.filter(s => s.niveau.includes(level)).map(s=>{
+      let rel = 0;
+      s.incidentMatch.forEach(im => { if(incidents.includes(im)) rel += 2; });
+      s.leerdoelMatch.forEach(lm => { if(leerdoelen.includes(lm)) rel += 1; });
+      return {...s, rel};
+    });
+
+    // Sorteer op relevantie, pak top 3
+    scored.sort((a,b)=>b.rel-a.rel);
+    // Zorg voor minimaal 3 door ook laag-relevante toe te voegen
+    const all = bank.filter(s=>s.niveau.includes(level));
+    while(scored.length < 3){
+      const extra = all.find(s=>!scored.find(x=>x.naam===s.naam));
+      if(extra) scored.push({...extra,rel:0}); else break;
+    }
+    return scored.slice(0,3);
+  }
+
+  /* ── GOOGLE DOC EXPORT ── */
+  // Globale staat voor export
+  let _exportData = {};
+
+  function exportNaarGoogleDoc(){
+    const btn = $('btn-gdoc');
+    const status = $('export-status');
+
+    // Bouw de document-inhoud op
+    const rolEl2  = document.querySelector('input[name=rol]:checked');
+    const rol     = rolEl2 ? (rolEl2.value === 'Overige' ? ($('overige-rol-input').value.trim() || 'Overige (niet ingevuld)') : rolEl2.value) : 'Niet ingevuld';
+    const jaren   = $('val-jaren').textContent;
+    const zeker   = $('val-zeker').textContent;
+    const leerstijl = (document.querySelector('input[name=leerstijl]:checked') || {}).value || 'Niet ingevuld';
+    const level   = $('res-level-title').textContent;
+    const levelSub = $('res-level-sub').textContent;
+
+    const incidenten = [...document.querySelectorAll('input[name=incident]:checked')].map(e=>e.value);
+    const leerdoelen = [...document.querySelectorAll('input[name=leerdoel]:checked')].map(e=>e.value);
+    const incidentOpen = ($('q-incident-open').value || '').trim();
+
+    const inzichten = [...document.querySelectorAll('#trainer-insights li span:last-child')].map(e=>e.textContent);
+    const scenarios = [...document.querySelectorAll('#scenario-list .scenario-item')].map((el,i)=>{
+      const naam = el.querySelector('.scenario-name').textContent;
+      const desc = el.querySelector('.scenario-desc').textContent;
+      const waarom = el.querySelector('.scenario-why').textContent.trim();
+      return {nr: i+1, naam, desc, waarom};
+    });
+
+    const datum = new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'});
+
+    // Bouw de tekst op die we in Google Docs plakken
+    const lines = [
+      'SCHERPSTELLEN — Trainingsprofiel ROT',
+      'Gegenereerd op: ' + datum,
+      'Scherp in Veiligheid | scherpinveiligheid.nl',
+      '',
+      '═══════════════════════════════════════',
+      '1. DEELNEMERPROFIEL',
+      '═══════════════════════════════════════',
+      'Rol in het ROT:          ' + rol,
+      'Ervaring:                ' + jaren,
+      'Zelfverzekerdheid:       ' + zeker,
+      'Leerstijl:               ' + leerstijl,
+      '',
+      '═══════════════════════════════════════',
+      '2. PRAKTIJKERVARING',
+      '═══════════════════════════════════════',
+      'Meegemaakt incident-typen:',
+      ...(incidenten.length ? incidenten.map(i => '  • ' + i) : ['  (geen geselecteerd)']),
+      '',
+      'Leerervaring (eigen woorden):',
+      incidentOpen ? '  ' + incidentOpen : '  (niet ingevuld)',
+      '',
+      '═══════════════════════════════════════',
+      '3. LEERDOELEN',
+      '═══════════════════════════════════════',
+      ...(leerdoelen.length ? leerdoelen.map(l => '  • ' + l) : ['  (geen geselecteerd)']),
+      '',
+      '═══════════════════════════════════════',
+      '4. ERVARINGSNIVEAU',
+      '═══════════════════════════════════════',
+      'Niveau: ' + level,
+      levelSub,
+      '',
+      '═══════════════════════════════════════',
+      '5. INZICHTEN VOOR DE TRAINER',
+      '═══════════════════════════════════════',
+      ...inzichten.map(t => '  • ' + t),
+      '',
+      '═══════════════════════════════════════',
+      '6. AANBEVOLEN OEFENSCENARIO\'S',
+      '═══════════════════════════════════════',
+      ...scenarios.flatMap(s => [
+        s.nr + '. ' + s.naam,
+        '   ' + s.desc,
+        '   ▸ Waarom: ' + s.waarom,
+        '',
+      ]),
+      '───────────────────────────────────────',
+      'Dit document is gegenereerd via Scherpstellen,',
+      'de ROT-trainingsvoorbereidingstool van Scherp in Veiligheid.',
+    ];
+
+    const tekst = lines.join('\n');
+
+    // Probeer clipboard te kopiëren, open daarna Google Docs nieuw document
+    btn.disabled = true;
+    btn.textContent = '⏳ Exporteren...';
+
+    let clipboardGelukt = false;
+    const copyPromise = navigator.clipboard
+      ? navigator.clipboard.writeText(tekst).then(()=>{ clipboardGelukt=true; }).catch(()=>{})
+      : Promise.resolve();
+
+    copyPromise.finally(()=>{
+      btn.disabled = false;
+      btn.textContent = '📄 Exporteer naar Google Doc';
+
+      status.hidden = false;
+      if(clipboardGelukt){
+        status.style.background = 'var(--teal-l)';
+        status.style.color = 'var(--teal)';
+        status.style.border = '1px solid var(--border)';
+        status.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span><strong>Profiel gekopieerd naar klembord.</strong> <a href="https://docs.google.com/document/create" target="_blank" rel="noopener" style="color:var(--orange);font-weight:600;">Open Google Docs →</a> en plak de tekst (Ctrl+V / ⌘+V) in een nieuw document.</span>`;
+      } else {
+        // Fallback: toon tekst in een modal zodat gebruiker zelf kan kopiëren
+        toonExportModal(tekst);
+        status.hidden = true;
+      }
+    });
+  }
+
+  function toonExportModal(tekst){
+    let modal = $('export-modal');
+    if(!modal){
+      modal = document.createElement('div');
+      modal.id = 'export-modal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;';
+      modal.innerHTML = `
+        <div style="background:var(--card);border-radius:14px;max-width:560px;width:100%;max-height:80dvh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.25);">
+          <div style="padding:20px 22px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:var(--fg);">Kopieer dit trainingsprofiel</span>
+            <button onclick="$('export-modal').hidden=true" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--fg-2);line-height:1;">×</button>
+          </div>
+          <p style="margin:12px 22px 8px;font-size:13px;color:var(--fg-2);">Selecteer alle tekst hieronder, kopieer het en plak het in een nieuw <a href="https://docs.google.com/document/create" target="_blank" rel="noopener" style="color:var(--teal);font-weight:600;">Google Doc →</a></p>
+          <textarea id="export-tekst" readonly style="flex:1;margin:0 22px 16px;min-height:200px;padding:12px;font-size:12px;font-family:monospace;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);resize:vertical;line-height:1.5;"></textarea>
+          <div style="padding:0 22px 18px;display:flex;gap:10px;">
+            <button onclick="selecteerAlles()" style="flex:1;padding:10px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-weight:600;font-size:13px;cursor:pointer;">Alles selecteren</button>
+            <a href="https://docs.google.com/document/create" target="_blank" rel="noopener" style="flex:1;padding:10px;background:var(--orange);color:#fff;border-radius:8px;font-family:'Sora',sans-serif;font-weight:600;font-size:13px;cursor:pointer;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;">Open Google Docs →</a>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+    }
+    modal.hidden = false;
+    $('export-tekst').value = tekst;
+  }
+
+  function selecteerAlles(){
+    const ta = $('export-tekst');
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+  }
+
+  // Checkbox max 3 voor leerdoelen
+  document.querySelectorAll('input[name=leerdoel]').forEach(cb=>{
+    cb.addEventListener('change',()=>{
+      const checked = document.querySelectorAll('input[name=leerdoel]:checked');
+      if(checked.length > 3){
+        cb.checked = false;
+      }
+    });
+  });
+</script>
+
+</body></html>
